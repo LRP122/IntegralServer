@@ -34,15 +34,36 @@ int main(int argc, char** argv){
     //fd_errorcheck(connect_fd, "Could not connect to server");
 
     std::cout << "Connected sucessfully\n";
-    int z;
-    std::cout << "From 0 to x we can integrate a function. Choose is x?\n";
-    std::cin >> z;
 
-    int x = htonl(z);
-    write(client_fd, &x, sizeof(x));
+    int choosen_number;
+    std::cout << "Which integral do you want to calculate? Enter the number :\n"
+             "1. Quadratic integral\n"
+             "2. Exponential integral\n"
+             "3. Gaussian integral\n";
+    std::cin >> choosen_number;
 
-    int y;
-    read(client_fd, &y, sizeof(y));
-    std::cout << "Received from server : " << ntohl(y) << " or " << y << std::endl;
+    float lower_bound;
+    float upper_bound;
+    float integral_solution;
+
+    std::cout << "What is the lower bound supossed to be?\n";
+    std::cin >> lower_bound;
+
+    std::cout << "What is the upper bound supossed to be?\n";
+    std::cin >> upper_bound;
+    float z = 12.43;
+
+    send(client_fd, &choosen_number, sizeof(choosen_number), 0);
+    send(client_fd, &lower_bound, sizeof(lower_bound), 0);
+    send(client_fd, &upper_bound, sizeof(upper_bound), 0);
+
+    std::cout << "Data is sent, waiting for calculations \n";
+
+    recv(client_fd,&integral_solution,sizeof(integral_solution),0);
+
+    std::cout << "Finished calculating. The soulution is " << integral_solution << std::endl;
+    
+    close(client_fd);
 
 }
+

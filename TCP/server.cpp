@@ -8,7 +8,7 @@
 #include <cstring>
 #include <netdb.h>
 #include "error_handling.h"
-#include "../main.cpp"
+#include "../src/integral.cpp"
 
 void fd_errorcheck(int fd,const char* error_message);
 
@@ -63,20 +63,18 @@ int main(int argc, char** argv){
     client_fd = accept(socket_fd, (struct sockaddr *) &client_addr,(socklen_t *) &client_addr_len);
     fd_errorcheck(client_fd, "Client can't connect to server");
 
-    int y;
-    read(client_fd, &y, sizeof(y));
-    std::cout << "Received " << ntohl(y) << " from client \n";
+    int choosen_function;
+    float lower_bound;
+    float upper_bound;
 
-    int new_num = htonl(25);
-    write(client_fd, &new_num, sizeof(new_num));
+    recv(client_fd,&choosen_function,sizeof(choosen_function),0);
+    recv(client_fd,&lower_bound,sizeof(lower_bound),0);
+    recv(client_fd,&upper_bound,sizeof(upper_bound),0);
 
-    std::cout << "Sent " << new_num << " with size " << sizeof(new_num) << std::endl;
+    float integral_solution = integral_calculations(lower_bound,upper_bound,choosen_function);
 
-    std::unique_ptr<Integral> integral_ptr = std::make_unique<Integral>();
-    float y = integral_ptr->integral_solution(std::move(integral_ptr),-2.43,3.0);
+    send(client_fd,&integral_solution,sizeof(integral_solution),0);
 
-    close(socket_fd);
-    std::cout << "Server is closed, script ran sucessfully";
 
     return(0);
 }
